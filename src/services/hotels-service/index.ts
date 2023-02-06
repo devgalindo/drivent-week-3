@@ -1,16 +1,15 @@
-import { notFoundError } from '@/errors';
-import hotelRepository from '@/repositories/hotels-repository';
-import httpStatus from 'http-status';
-import { PaymentRequiredError } from './errors';
+import { notFoundError } from "@/errors";
+import hotelRepository from "@/repositories/hotels-repository";
+import { PaymentRequiredError } from "./errors";
 
 async function getAllHotels(userId: number) {
-  verifyTicketAndEnrollment(userId);
+  await verifyTicketAndEnrollment(userId);
 
   return await hotelRepository.getAllHotels();
 }
 
 async function getRoomsBySpecifiedHotel(hotelId: number, userId: number) {
-  verifyTicketAndEnrollment(userId);
+  await verifyTicketAndEnrollment(userId);
 
   return await hotelRepository.getRoomsBySpecifiedHotel(hotelId);
 }
@@ -18,13 +17,25 @@ async function getRoomsBySpecifiedHotel(hotelId: number, userId: number) {
 async function verifyTicketAndEnrollment(userId: number) {
   const enrollment = await hotelRepository.getEnrollmentByUserId(userId);
 
-  if (!enrollment) throw notFoundError()
+  if (!enrollment) {
+    throw notFoundError();
+  }
 
   const ticket = await hotelRepository.getTicketByEnrollmentId(enrollment.id);
 
-  if (!ticket) throw notFoundError();
+  if (!ticket) {
+    throw notFoundError();
+  }
 
-  if (!ticket.TicketType.includesHotel || ticket.TicketType.isRemote || ticket.status === 'RESERVED') {
+  if (ticket.TicketType.isRemote) {
+    throw PaymentRequiredError();
+  }
+
+  if (!ticket.TicketType.includesHotel) {
+    throw PaymentRequiredError();
+  }
+
+  if (ticket.status === "RESERVED") {
     throw PaymentRequiredError();
   }
 }

@@ -1,4 +1,4 @@
-import { prisma } from '@/config';
+import { prisma } from "@/config";
 
 async function getAllHotels() {
   return await prisma.hotel.findMany({
@@ -19,8 +19,8 @@ async function getEnrollmentByUserId(userId: number) {
 }
 
 async function getTicketByEnrollmentId(enrollmentId: number) {
-  return await prisma.ticket.findUnique({
-    where: { id: enrollmentId },
+  return await prisma.ticket.findFirst({
+    where: { enrollmentId },
     include: { TicketType: true },
   });
 }

@@ -47,11 +47,11 @@ describe("createUserSchema", () => {
     });
   });
 
-    it("should return no error if input is valid", () => {
-      const input = generateValidInput();
+  it("should return no error if input is valid", () => {
+    const input = generateValidInput();
 
-      const { error } = createUserSchema.validate(input);
+    const { error } = createUserSchema.validate(input);
 
-      expect(error).toBeUndefined();
-    });
+    expect(error).toBeUndefined();
+  });
 });
